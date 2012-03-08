@@ -10,6 +10,25 @@ class MoviesController < ApplicationController
     @all_ratings = Movie.ratings
     @sort = params[:sort]
     @ratings = params[:ratings] ? params[:ratings].keys : []
+    
+    redirect = false
+    
+    if @sort == nil and session[:sort]
+      redirect = true
+    else 
+      session[:sort] = @sort
+    end
+    
+    if @ratings.length == 0 and session[:ratings]
+      redirect = true
+    else 
+      session[:ratings] = params[:ratings]
+    end
+    
+    if redirect
+      redirect_to movies_path({:sort => session[:sort], :ratings => session[:ratings]})
+    end
+    
     if @sort == 'title'
       @movies = Movie.find(:all, :conditions => {:rating => @ratings.empty? ? @all_ratings : @ratings }, :order => "title ASC")
     elsif @sort == 'release_date'
